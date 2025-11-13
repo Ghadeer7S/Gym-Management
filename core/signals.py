@@ -25,24 +25,6 @@ def send_welcome_email_after_registration(sender, user, request, **kwargs):
     )
 
 @receiver(post_save, sender=User)
-def rsend_activation_email(sender, instance, created, **kwargs):
-    if instance.activation_code and not instance.is_active:
-        subject = "Your Activation Code"
-        message = (
-                f"Hello {instance.first_name},\n\n"
-                f"Here is your new activation code: {instance.activation_code}\n"
-                f"This code will expire in 5 minutes.\n\n"
-                f"If you didn’t request this, you can ignore this email."
-        )
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [instance.email],
-            fail_silently=True,
-        )
-
-@receiver(post_save, sender=User)
 def send_password_reset_email(sender, instance, created, **kwargs):
     if instance.reset_code and not created:
         subject = "Password Reset Request"
