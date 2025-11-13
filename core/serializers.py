@@ -1,12 +1,13 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import exceptions, serializers
-from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
+from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer,\
+UserSerializer as BaseUserSerializer
+
 from .validators import (
     validate_activation_data, validate_resend_activation,
     validate_user_email, validate_new_password_strength,
     validate_password_reset_data
 )
-from .models import User
 
 class UserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
@@ -22,6 +23,10 @@ class UserCreateSerializer(BaseUserCreateSerializer):
 
         user.save()
         return user
+    
+class UserSerializer(BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
