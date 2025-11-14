@@ -139,10 +139,6 @@ SIMPLE_JWT = {
    "TOKEN_OBTAIN_SERIALIZER": "core.serializers.MyTokenObtainPairSerializer",
 }
 
-DJOSER = {
-    'TOKEN_MODEL': None
-}
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -177,7 +173,8 @@ DJOSER = {
         'user_create': 'core.serializers.UserCreateSerializer',
         'current_user': 'core.serializers.UserSerializer',
         'user': 'core.serializers.UserSerializer'
-    }
+    },
+    'TOKEN_MODEL': None
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
