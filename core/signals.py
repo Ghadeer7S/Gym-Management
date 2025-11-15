@@ -23,17 +23,3 @@ def send_welcome_email_after_registration(sender, user, request, **kwargs):
         [user.email],
         fail_silently=False
     )
-
-@receiver(post_save, sender=User)
-def send_password_reset_email(sender, instance, created, **kwargs):
-    if instance.reset_code and not created:
-        subject = "Password Reset Request"
-        message = (
-            f"Hello {instance.first_name or instance.username},\n\n"
-            f"Your password reset code is: {instance.reset_code}\n\n"
-            "This code will expire in 5 minutes.\n"
-            "If you did not request a password reset, please ignore this message."
-        )
-        from_email = settings.DEFAULT_FROM_EMAIL
-        recipient_list = [instance.email]
-        send_mail(subject, message, from_email, recipient_list)

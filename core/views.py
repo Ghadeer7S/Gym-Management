@@ -1,12 +1,14 @@
-from rest_framework import mixins, status
-from rest_framework.viewsets import GenericViewSet
+from rest_framework import status
 from rest_framework.response import Response
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
 from .serializers import (
     CustomActivationSerializer, ResendActivationCodeSerializer,
     CustomPasswordResetRequestSerializer, CustomPasswordResetConfirmSerializer
 )
 from django.core.mail import send_mail
 from django.conf import settings
+from rest_framework import viewsets
 
 class ActivationViewSet(mixins.CreateModelMixin, GenericViewSet):
     serializer_class = CustomActivationSerializer
@@ -20,7 +22,7 @@ class ActivationViewSet(mixins.CreateModelMixin, GenericViewSet):
             status=status.HTTP_200_OK
         )
     
-class ResendActivationViewSet(mixins.CreateModelMixin, GenericViewSet):
+class ResendActivationViewSet(viewsets.ViewSet):
     serializer_class = ResendActivationCodeSerializer
 
     def create(self, request, *args, **kwargs):
@@ -48,17 +50,29 @@ class ResendActivationViewSet(mixins.CreateModelMixin, GenericViewSet):
             status=status.HTTP_200_OK
         )
 
-class PasswordResetRequestViewSet(mixins.CreateModelMixin, GenericViewSet):
+class PasswordResetRequestViewSet(viewsets.ViewSet):
     serializer_class = CustomPasswordResetRequestSerializer
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(
-            {"detail": "A password reset code has been sent."},
-            status=status.HTTP_200_OK
+
+        user = serializer.validated_data["user"]
+        user.generate_reset_code()
+
+        # إرسال الإيميل هنا بدلاً من signal
+        send_mail(
+            "Password Reset Request",
+            f"Hello {user.first_name or user.username},\n\n"
+            f"Your password reset code is: {user.reset_code}\n\n"
+            "This code will expire in 5 minutes.\n",
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
         )
+
+        return Response({"detail": "Reset code sent to email."})
+
 
 class PasswordResetConfirmViewSet(mixins.CreateModelMixin, GenericViewSet):
     serializer_class = CustomPasswordResetConfirmSerializer

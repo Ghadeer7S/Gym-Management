@@ -77,10 +77,6 @@ class CustomPasswordResetRequestSerializer(serializers.Serializer):
         attrs["user"] = user
         return attrs
     
-    def save(self, **kwargs):
-        user = self.validated_data["user"]
-        user.generate_reset_code()
-        return user
 
 class CustomPasswordResetConfirmSerializer(serializers.Serializer):
     email = serializers.EmailField()

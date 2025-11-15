@@ -45,8 +45,7 @@ class User(AbstractUser):
     # reset code
     def generate_reset_code(self, minutes_valid=5):
         code = ''.join(\
-            random.choices(string.ascii_lowercase\
-                            + string.digits + string.ascii_uppercase, k=6))
+            random.choices(string.digits + string.ascii_uppercase, k=6))
         self.reset_code = code
         self.reset_expires_at = timezone.now() + timedelta(minutes=minutes_valid)
         self.save(update_fields=['reset_code', 'reset_expires_at'])
