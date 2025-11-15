@@ -17,18 +17,19 @@ class ProfileViewSet(ListModelMixin, RetrieveModelMixin, UpdateModelMixin, Gener
             return [IsAuthenticated()]
         return [IsAdminUser()]
 
-    @action(detail=False, methods=['GET', 'PUT'])
+    @action(detail=False, methods=['GET', 'PUT', 'PATCH'])
     def me(self, request):
         profile = Profile.objects.get(user_id=request.user.id)
         if request.method == 'GET':
             serializer = ProfileSerializer(profile, context={'request': request})
             return Response(serializer.data)
-        elif request.method == 'PUT':
-            serializer = ProfileSerializer(profile, data=request.data, context={'request': request})
+        elif request.method in ['PUT', 'PATCH']:
+            serializer = ProfileSerializer(
+                profile,
+                data=request.data,
+                partial=(request.method == 'PATCH'),
+                context={'request': request}
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
-    
-    @extend_schema(exclude=True)
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)

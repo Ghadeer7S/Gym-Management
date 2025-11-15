@@ -22,7 +22,7 @@ class ActivationViewSet(mixins.CreateModelMixin, GenericViewSet):
             status=status.HTTP_200_OK
         )
     
-class ResendActivationViewSet(viewsets.ViewSet):
+class ResendActivationViewSet(mixins.CreateModelMixin, GenericViewSet):
     serializer_class = ResendActivationCodeSerializer
 
     def create(self, request, *args, **kwargs):
@@ -50,7 +50,7 @@ class ResendActivationViewSet(viewsets.ViewSet):
             status=status.HTTP_200_OK
         )
 
-class PasswordResetRequestViewSet(viewsets.ViewSet):
+class PasswordResetRequestViewSet(mixins.CreateModelMixin, GenericViewSet):
     serializer_class = CustomPasswordResetRequestSerializer
 
     def create(self, request):
